@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{background: var(--tg-theme-bg-color, #0f172a); color: var(--tg-theme-text-color, white)}</style>
+</head>
+<body class="p-4 max-w-md mx-auto">
+<script>Telegram.WebApp.ready(); Telegram.WebApp.expand();</script>
+
+<h1 class="text-2xl font-bold mb-1">👑 Grandmaster OS</h1>
+<p class="text-sm opacity-60 mb-4">Your AI company in Telegram</p>
+
+<!-- CREATE TASK CARD -->
+<div class="bg-white/10 backdrop-blur rounded-2xl p-4 mb-4 border border-white/10">
+<h2 class="font-bold mb-3">+ Create New Task</h2>
+<input id="task_id" placeholder="Task ID e.g. T5" class="w-full p-3 rounded-xl bg-black/20 border border-white/10 mb-2 text-white placeholder:opacity-50">
+<input id="owner" placeholder="Owner e.g. frontend-dev" class="w-full p-3 rounded-xl bg-black/20 border border-white/10 mb-2 text-white placeholder:opacity-50">
+<input id="file_scope" placeholder="File to lock e.g. login.html" class="w-full p-3 rounded-xl bg-black/20 border border-white/10 mb-2 text-white placeholder:opacity-50">
+<textarea id="desc" placeholder="What to build? e.g. Create login page with Google sign-in" class="w-full p-3 rounded-xl bg-black/20 border border-white/10 mb-3 text-white placeholder:opacity-50"></textarea>
+<button onclick="createTask()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl">Create Task</button>
+<p id="msg" class="text-sm mt-2 text-center"></p>
+</div>
+
+<!-- TASK BOARD -->
+<div class="bg-white/10 rounded-2xl p-4 mb-4 border border-white/10">
+<div class="flex justify-between items-center mb-3">
+<h2 class="font-bold">📋 Task Board</h2>
+<button onclick="loadTasks()" class="text-xs bg-white/20 px-3 py-1 rounded-full">Refresh</button>
+</div>
+<div id="tasks" class="space-y-2 text-sm">Loading...</div>
+</div>
+
+<!-- QUICK ACTIONS -->
+<div class="grid grid-cols-2 gap-3">
+<a href="https://github.com" target="_blank" class="bg-white/10 rounded-xl p-3 text-center border border-white/10">
+<div class="text-xl">💻</div><div class="text-xs font-bold">GitHub PR</div></a>
+<a href="https://vercel.com" target="_blank" class="bg-white/10 rounded-xl p-3 text-center border border-white/10">
+<div class="text-xl">🚀</div><div class="text-xs font-bold">Vercel Preview</div></a>
+</div>
+
+<script>
+const API = location.origin; // Will be your BOSS URL
+
+async function createTask(){
+  const id = document.getElementById(\'task_id\').value;
+  const owner = document.getElementById(\'owner\').value;
+  const file_scope = document.getElementById(\'file_scope\').value;
+  const description = document.getElementById(\'desc\').value;
+  if(!id || !owner || !description){ document.getElementById(\'msg\').innerText = "Fill all fields!"; return; }
+  
+  const res = await fetch(API + \'/tasks\', {
+    method: \'POST\',
+    headers: {\'Content-Type\':\'application/json\'},
+    body: JSON.stringify({id, owner, description, status: "todo", file_scope, dependencies: []})
+  });
+  const data = await res.json();
+  if(data.error){ document.getElementById(\'msg\').innerText = "❌ " + data.error; document.getElementById(\'msg\').style.color = "#ff6b6b"; }
+  else { document.getElementById(\'msg\').innerText = "✅ Task " + id + " created!"; document.getElementById(\'msg\').style.color = "#51cf66"; loadTasks(); }
+}
+
+async function loadTasks(){
+  const res = await fetch(API + \'/tasks\');
+  const data = await res.json();
+  const container = document.getElementById(\'tasks\');
+  if(Object.keys(data).length === 0){ container.innerHTML = "<p class=\'opacity-50 text-center\'>No tasks yet</p>"; return; }
+  container.innerHTML = "";
+  for(let id in data){
+    let t = data[id];
+    let color = t.status === "done" ? "bg-green-500" : "bg-yellow-500";
+    container.innerHTML += `<div class="bg-black/20 rounded-xl p-3 border border-white/5">
+      <div class="flex justify-between"><span class="font-bold">${t.id}</span><span class="text-xs ${color} px-2 py-1 rounded-full">${t.status}</span></div>
+      <div class="opacity-70 text-xs mt-1">${t.description}</div>
+      <div class="opacity-50 text-xs mt-1">👤 ${t.owner} • 📁 ${t.file_scope || "no file lock"}</div>
+      ${t.status !== "done" ? `<button onclick="markDone(\'${t.id}\')" class="mt-2 w-full bg-white/20 rounded-lg py-1 text-xs">Mark as Done</button>` : ""}
+    </div>`;
+  }
+}
+
+async function markDone(id){
+  await fetch(API + \'/tasks/\' + id + \'?status=done\', {method: \'PUT\'});
+  loadTasks();
+}
+
+loadTasks();
+setInterval(loadTasks, 3000);
+</script>
+</body>
+</html> 

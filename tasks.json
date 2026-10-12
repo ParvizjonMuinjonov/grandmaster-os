@@ -1,0 +1,36 @@
+{
+  "T1": {
+    "id": "T1",
+    "owner": "dev-1",
+    "description": "Create a welcome page that says Hello Grandmaster OS",
+    "status": "done",
+    "file_scope": "welcome.html",
+    "dependencies": []
+  },
+  "T2": {
+    "id": "T2",
+    "owner": "frontend-dev",
+    "description": "Create dashboard page",
+    "status": "done",
+    "file_scope": "dashboard.html",
+    "dependencies": []
+  },
+  "T3": {
+    "id": "T3",
+    "owner": "backend-dev",
+    "description": "Try to edit same dashboard page",
+    "status": "todo",
+    "file_scope": "dashboard.html",
+    "dependencies": []
+  },
+  "T4": {
+    "id": "T4",
+    "owner": "qa-engineer",
+    "description": "Test the dashboard",
+    "status": "todo",
+    "file_scope": "test_dashboard.js",
+    "dependencies": [
+      "T2"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "user-api": {
+    "id": "user-api",
+    "version": "v1",
+    "schema": {
+      "endpoint": "/api/users",
+      "returns": {
+        "id": "string",
+        "email": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "M1": {
+    "message_id": "M1",
+    "run_id": "run-1",
+    "task_id": "T2",
+    "sender": "frontend-dev",
+    "recipient": "orchestrator",
+    "type": "blocker",
+    "plan_version": "v1",
+    "content": "I need the user-api contract before I can build dashboard.html",
+    "requested_action": "Please lock user-api contract"
+  },
+  "M2": {
+    "message_id": "M2",
+    "run_id": "run-1",
+    "task_id": "T2",
+    "sender": "orchestrator",
+    "recipient": "frontend-dev",
+    "type": "handoff",
+    "plan_version": "v1",
+    "content": "Contract user-api v1 is locked. You can start now.",
+    "requested_action": "accepted"
+  }
+}
